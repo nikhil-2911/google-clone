@@ -1,25 +1,45 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-function App() {
+//component
+import Home from "./components/HomeScreen/Home";
+import SearchScreen from "./components/SearchScreen/SearchScreen";
+import { searchData } from "./api/googleSearch";
+
+const App = () => {
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [googleData, setGoogleData] = useState({});
+  const setSearch = async (term) => {
+    setSearchTerm(term);
+    const data = await searchData(term);
+    // console.log(data);
+    setGoogleData(data);
+    navigate("/search");
+  };
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Routes>
+        <Route path="/" element={<Home setSearch={setSearch} />} />
+        {searchTerm !== "" ? (
+          <Route
+            path="/search"
+            element={
+              <SearchScreen
+                setSearch={setSearch}
+                searchTerm={searchTerm}
+                googleData={googleData}
+              />
+            }
+          />
+        ) : null}
+        <Route path="*" element={<Home />} />
+      </Routes>
+    </>
   );
-}
+};
 
 export default App;
